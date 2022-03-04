@@ -93,4 +93,9 @@ class FCNHead(BaseDecodeHead):
         """Forward function."""
         output = self._forward_feature(inputs)
         output = self.cls_seg(output)
+        
+        # DEBUG
+        print(f"Output shape: {output.shape}")
+        print(f"Shape of expected logits: {self.output.shape}")
+        
         return output
