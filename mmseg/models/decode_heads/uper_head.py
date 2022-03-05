@@ -137,4 +137,9 @@ class UPerHead(BaseDecodeHead):
         """Forward function."""
         output = self._forward_feature(inputs)
         output = self.cls_seg(output)
+        
+        # DEBUG
+        print(f"Output shape: {output.shape}")
+        print(f"Expected logits: {output[0, :3, :3, :3]}")
+        
         return output
