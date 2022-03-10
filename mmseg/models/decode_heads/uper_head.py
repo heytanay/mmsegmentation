@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from sqlalchemy import lateral
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
@@ -98,10 +99,17 @@ class UPerHead(BaseDecodeHead):
         inputs = self._transform_inputs(inputs)
 
         # build laterals
-        laterals = [
-            lateral_conv(inputs[i])
-            for i, lateral_conv in enumerate(self.lateral_convs)
-        ]
+        laterals = []
+        for i, lateral_conv in enumerate(self.lateral_convs):
+            print(f"Pre-lateral - {i}:", inputs[i].shape)
+            current_output = lateral_conv(inputs[i])
+            print(f"Post-lateral conv - {i}:", current_output.shape)
+            laterals.append(current_output)
+            
+        # laterals = [
+        #     lateral_conv(inputs[i])
+        #     for i, lateral_conv in enumerate(self.lateral_convs)
+        # ]
 
         laterals.append(self.psp_forward(inputs))
 
