@@ -112,12 +112,12 @@ def inference_segmentor(model, img):
 
     # forward the model
     print(data['img'])
-    print(data['img'].shape)
+    print(len(data['img']))
 
     data['img'] = prepare_img()
     
     with torch.no_grad():
-        result = model(return_loss=False, rescale=True, **data)
+        result = model(return_loss=False, rescale=False, **data)
     return result
 
 
