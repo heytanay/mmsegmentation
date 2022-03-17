@@ -10,6 +10,10 @@ from ..builder import SEGMENTORS
 from .base import BaseSegmentor
 
 def prepare_img(size=640):
+    import requests
+    from PIL import Image
+    import torchvision.transforms as T
+    
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     im = Image.open(requests.get(url, stream=True).raw)
 
