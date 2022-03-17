@@ -5,9 +5,26 @@ import torch
 from mmcv.parallel import collate, scatter
 from mmcv.runner import load_checkpoint
 
+from PIL import Image
+import requests
+import torchvision.transforms as T
+
 from mmseg.datasets.pipelines import Compose
 from mmseg.models import build_segmentor
 
+def prepare_img():
+    url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+    im = Image.open(requests.get(url, stream=True).raw)
+
+    transforms = T.Compose([T.Resize((512, 512)),
+            T.ToTensor(),
+            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),]
+    )
+
+    im = transforms(im).unsqueeze(0) # batch size 1
+    return im
+
+img = prepare_img()
 
 def init_segmentor(config, checkpoint=None, device='cuda:0'):
     """Initialize a segmentor from config file.
@@ -94,6 +111,11 @@ def inference_segmentor(model, img):
         data['img_metas'] = [i.data[0] for i in data['img_metas']]
 
     # forward the model
+    print(data['img'])
+    print(data['img'].shape)
+
+    data['img'] = prepare_img()
+    
     with torch.no_grad():
         result = model(return_loss=False, rescale=True, **data)
     return result
