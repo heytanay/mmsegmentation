@@ -9,6 +9,20 @@ from .. import builder
 from ..builder import SEGMENTORS
 from .base import BaseSegmentor
 
+def prepare_img(size=640):
+    url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+    im = Image.open(requests.get(url, stream=True).raw)
+
+    transforms = T.Compose([T.Resize((size, size)),
+            T.ToTensor(),
+            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),]
+    )
+
+    im = transforms(im).unsqueeze(0) # batch size 1
+    print("Image loading successfull.")
+    return im
+
+img = prepare_img()
 
 @SEGMENTORS.register_module()
 class EncoderDecoder(BaseSegmentor):
@@ -199,7 +213,9 @@ class EncoderDecoder(BaseSegmentor):
 
     def whole_inference(self, img, img_meta, rescale):
         """Inference with full image."""
-
+        rescale = False
+        # img = img.unsqueeze(0)
+        img = img.cuda()
         seg_logit = self.encode_decode(img, img_meta)
         if rescale:
             # support dynamic shape for onnx
