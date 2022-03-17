@@ -114,7 +114,7 @@ def inference_segmentor(model, img):
     # print(data['img'])
     # print(len(data['img']))
 
-    data['img'] = [prepare_img()]
+    data['img'] = [prepare_img().cuda()]
     
     with torch.no_grad():
         result = model(return_loss=False, rescale=False, **data)
